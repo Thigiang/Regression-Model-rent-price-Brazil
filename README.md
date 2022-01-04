@@ -1,1 +1,4 @@
 # Regression-Model-rent-price-Brazil
+The dataset is from kaggle: https://www.kaggle.com/rubenssjr/brasilian-houses-to-rent
+For this data, the feature area surprising does not effect the rent amount. Similarly, the rent will not change if the owner changes from accept to not accept animal.Sao Paulo is the capital of Brazil, so it makes sense that when the tenant shifts their home from Belo Horizonte to Sao Paulo, their rent will increase. Also for this dataset, as the area, room, HOA and insurance increase, the rent will also rise up, but at some point, the rent will not increase no matter how much these feature increase. The property tax seems to be different that it inversely proportional to the rent amount. 
+The regression model initally violated the normality assumption. I checked and did transformation on the response to solve it.
