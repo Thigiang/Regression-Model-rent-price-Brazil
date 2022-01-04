@@ -77,7 +77,7 @@ qqplot<-function(reg){
 #start regression model with secondegree
       res2<-lm(y~x$C+cx$AR+cx$R+cx$B+cx$PK+cx$FL+cx$HOA+cx$Tax+cx$I+I(cx$AR^2)+I(cx$R^2)+I(cx$B^2)+I(cx$PK^2)+I(cx$FL^2)+I(cx$HOA^2)+I(cx$Tax^2)+I(cx$I^2))
       summary(res2)
-      qqplot(res2) #serve violation on normality assumption
+      qqplot(res2) #severe violation on normality assumption
       bc<-boxcox(res2) #check if the model needs transformation
       lambda<-bc$x[which.max(bc$y)]
       y.prime<-y^lambda
@@ -88,14 +88,13 @@ qqplot<-function(reg){
       summary(res2p) #MSRES reduce 
       qqplot(res2p) #normality assumption has not been solved
      
-      boxcox(res2p)
-      #Trying transformation on the regressor Area and Insurance by using natural log
+      #try model without regressor insurance Insurance 
       res2p<-lm(y~x$C+cx$AR+cx$R+cx$B+cx$PK+cx$FL+x$AN+x$FR+ cx$HOA+cx$Tax+
                   I(cx$AR^2)+I(cx$R^2)+I(cx$B^2)+I(cx$PK^2)+I(cx$FL^2)+I(cx$HOA^2)+
                   I(cx$Tax^2)+
                   cx$AR:cx$Tax+cx$AR:cx$HOA+cx$Tax:cx$HOA)
-      summary(res2p)
-      qqplot(res2p)
+      summary(res2p) #MS res increases, R2 reduce
+      qqplot(res2p) #not improve
       bc<-boxcox(res2p) #check if the model needs transformation
       lambda<-bc$x[which.max(bc$y)]
       y.prime<-y^lambda
@@ -103,8 +102,9 @@ qqplot<-function(reg){
                   cx$I+I(cx$AR^2)+I(cx$R^2)+I(cx$B^2)+I(cx$PK^2)+I(cx$FL^2)+I(cx$HOA^2)+
                   I(cx$Tax^2)+I(cx$I^2)+cx$AR:cx$I)
       summary(res2p) #MSRES reduce 
-      qqplot(res2p)
-      residualPlot(res2p$fitted.values,res2p)
+      par(mfrow=c(3,3))
+      qqplot(res2p) #normality assumption has been solve
+      residualPlot(res2p$fitted.values,res2p,"fitted values")
       which(cx$I>600) #might need to remove 2180
       
       
