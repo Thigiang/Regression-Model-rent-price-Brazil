@@ -8,10 +8,10 @@ house.rent<-read.csv("houses_to_rent_v2.csv")
 #View(house.rent)
 #Defining function to plot residuals and qqplot
 residualPlot<-function(data,reg,name){
-  plot(data, rstudent(reg), xlab=name)
+  plot(data, rstudent(reg), xlab=name, col="blue")
 }
 qqplot<-function(reg){
-  qqnorm(rstudent(reg))
+  qqnorm(rstudent(reg), col="blue")
   qqline(rstudent(reg))
 }
 
@@ -39,21 +39,7 @@ qqplot<-function(reg){
       
       #####NUMERICAL
       #area: might need to drop area that is greater than 1000  :  655 2398 2424 3560 4814 5130 5916 8791 9242
-      summary.data<-function(ordata,new){
-        summ<-ggtexttable((round(summary(ordata),2)))
-        boxpl<-ggplot(data=house.rent, aes(x=ordata))+
-          geom_boxplot(col='blue',fill='skyblue1')+
-          scale_y_discrete()
-        
-        boxpl1<-ggplot(data=NULL,aes(x=new))+
-          geom_boxplot(col='blue',fill='skyblue1')+
-          scale_y_discrete()
-        ggarrange(boxpl+coord_flip(),summ,boxpl1+coord_flip(), ncol=3,nrow=1,widths = c(2,1))
-      }
-      
-      summary.data(house.rent$area,x$AR)
-      
-#Cleaning data before we work on the regression model based on the above plot
+      #Cleaning data before we work on the regression model based on the above plot
       dropped.value<-c(6244,6646,2860,256, 6980,6231,2929, 1445,655,2398,2424,3560,4814,5130,5916,8791,9242,2563)
       x<-house.rent[,c(1:9,11:12)]
       x<-x[-dropped.value,]
@@ -62,6 +48,31 @@ qqplot<-function(reg){
       names(x)<-c("C","AR","R","B","PK","FL","AN","FR","HOA","Tax","I")
       x2<-cbind(x,x$AR^2,x$R^2,x$B^2,x$PK^2,x$FL^2,x$HOA^2,x$Tax^2,x$I^2)
       names(x2)<-c("C","AR","R","B","PK","FL","AN","FR","HOA","Tax","I","AR^2","R^2","B^2","PK^2","FL^2","HOA^2","Tax^2","I^2")
+      
+      
+      summary.data<-function(ordata,new,ylable1,ylable2){
+        summ<-ggtexttable((round(summary(ordata),2)))
+        boxpl<-ggplot(data=house.rent, aes(x=ordata))+
+          xlab(ylable1)+
+          geom_boxplot(col='blue',fill='skyblue1')+
+          scale_y_discrete()
+        
+        boxpl1<-ggplot(data=NULL,aes(x=new))+
+          xlab(ylable2)+
+          geom_boxplot(col='blue',fill='skyblue1')+
+          scale_y_discrete()
+        ggarrange(boxpl+coord_flip(),summ,boxpl1+coord_flip(), ncol=3,nrow=1,widths = c(2,1))
+      }
+      
+      summary.data(house.rent$area,x$AR,"area","new area")
+      summary.data(house.rent$rooms,x$R,"Room","New Room")
+      summary.data(house.rent$bathroom,x$B,"bathroom","New bathroom")
+      summary.data(house.rent$parking.spaces,x$PK,"parking","New parking")
+      summary.data(house.rent$floor,x$FL,"floor","new floor")
+      summary.data(house.rent$hoa..R..,x$HOA,"HOA","New HOA")
+      summary.data(house.rent$property.tax..R..,x$Tax,"tax","new tax")
+      summary.data(house.rent$fire.insurance..R..,x$I,"Insurance","New Insurance")
+        
 
 #Check multicolinearity with cor()
       cor(x2[,c(2:6,9:19)]) #seem like they are correlated (more than 60%), the term squares are strongly correlated
@@ -102,7 +113,7 @@ qqplot<-function(reg){
                   cx$I+I(cx$AR^2)+I(cx$R^2)+I(cx$B^2)+I(cx$PK^2)+I(cx$FL^2)+I(cx$HOA^2)+
                   I(cx$Tax^2)+I(cx$I^2)+cx$AR:cx$I)
       summary(res2p) #MSRES reduce 
-      par(mfrow=c(3,3))
+      par(mfrow=c(3,4))
       qqplot(res2p) #normality assumption has been solve
       residualPlot(res2p$fitted.values,res2p,"fitted values")
       which(cx$I>600) #might need to remove 2180
